@@ -38,6 +38,7 @@ const samples = [
   {
     name: "Internet",
     input: "",
+    timeLimitMs: 5000,
     code: 'fetch("https://example.com").then(() => console.log("got internet")).catch(() => console.log("no internet"));',
   },
 ];
@@ -52,7 +53,7 @@ async function main() {
       language: "javascript",
       code: sample.code,
       input: sample.input,
-      timeLimitMs: 2000,
+      timeLimitMs: sample.timeLimitMs || 2000,
       memoryLimitMb: 128,
     });
 
