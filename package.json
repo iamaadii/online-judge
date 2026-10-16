@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "seed": "node src/seed.js"
+    "seed": "node src/seed.js",
+    "try-runner": "node src/judge/tryRunner.js"
   },
   "author": "",
   "license": "ISC",
