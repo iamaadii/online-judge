@@ -6,17 +6,46 @@ import path from "node:path";
 import { languages } from "./languages.js";
 
 const MAX_OUTPUT_CHARS = 64 * 1024;
-const STARTUP_ALLOWANCE_MS = 1500;
+const STARTUP_ALLOWANCE_MS = 1000;
+
+function runDocker(args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn("docker", args);
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (chunk) => {
+      stdout = stdout + chunk.toString();
+    });
+
+    child.stderr.on("data", (chunk) => {
+      stderr = stderr + chunk.toString();
+    });
+
+    child.on("error", (err) => {
+      reject(err);
+    });
+
+    child.on("close", (exitCode) => {
+      resolve({ exitCode: exitCode, stdout: stdout, stderr: stderr });
+    });
+  });
+}
 
 function killContainer(containerName) {
-  const killer = spawn("docker", ["kill", containerName]);
+  const killer = spawn("docker", ["kill", containerName], { stdio: "ignore" });
   killer.on("error", () => {});
 }
 
-function runContainer(args, containerName, input, timeLimitMs) {
+function removeContainer(containerName) {
+  const remover = spawn("docker", ["rm", "-f", containerName], { stdio: "ignore" });
+  remover.on("error", () => {});
+}
+
+function runContainer(containerName, input, timeLimitMs) {
   return new Promise((resolve, reject) => {
     const startedAt = Date.now();
-    const child = spawn("docker", args);
+    const child = spawn("docker", ["start", "-a", "-i", containerName]);
 
     let stdout = "";
     let stderr = "";
@@ -83,6 +112,7 @@ export async function runInSandbox(options) {
   const language = languages[options.language];
   const timeLimitMs = options.timeLimitMs || 2000;
   const memoryLimitMb = options.memoryLimitMb || 128;
+  const containerName = "judge-" + randomUUID();
 
   const folder = await fs.mkdtemp(path.join(os.tmpdir(), "judge-"));
 
@@ -90,11 +120,10 @@ export async function runInSandbox(options) {
     await fs.chmod(folder, 0o755);
     await fs.writeFile(path.join(folder, language.fileName), options.code, { mode: 0o644 });
 
-    const containerName = "judge-" + randomUUID();
     const memory = memoryLimitMb + "m";
 
-    const args = [
-      "run", "--rm", "-i",
+    const createArgs = [
+      "create", "--rm", "-i",
       "--name", containerName,
       "--network", "none",
       "--memory", memory,
@@ -109,8 +138,15 @@ export async function runInSandbox(options) {
       language.image,
     ].concat(language.command);
 
-    return await runContainer(args, containerName, options.input, timeLimitMs);
+    const created = await runDocker(createArgs);
+
+    if (created.exitCode !== 0) {
+      throw new Error("Could not create the container: " + created.stderr.trim());
+    }
+
+    return await runContainer(containerName, options.input, timeLimitMs);
   } finally {
+    removeContainer(containerName);
     await fs.rm(folder, { recursive: true, force: true });
   }
 }
