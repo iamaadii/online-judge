@@ -5,11 +5,12 @@ import { Submission } from "../models/Submission.js";
 import { languages } from "../judge/languages.js";
 import { requireLogin } from "../middleware/requireLogin.js";
 import { addJudgeJob } from "../queue/judgeQueue.js";
+import { submitLimit } from "../middleware/submitLimit.js";
 
 const router = express.Router();
 const MAX_CODE_LENGTH = 20000;
 
-router.post("/", requireLogin, async (req, res) => {
+router.post("/", requireLogin, submitLimit, async (req, res) => {
   try {
     const body = req.body || {};
     const problemSlug = String(body.problemSlug || "").trim();
