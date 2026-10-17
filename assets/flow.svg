@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" role="img" aria-label="Submission flow: client, API, Redis queue, worker, Docker sandbox, verdict">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#1e1b4b"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .box { fill:#1e293b; stroke:#475569; stroke-width:2; }
+    .label { font-family:Segoe UI, Helvetica, Arial, sans-serif; font-size:15px; font-weight:700; fill:#f8fafc; text-anchor:middle; }
+    .sub { font-family:Segoe UI, Helvetica, Arial, sans-serif; font-size:12px; fill:#94a3b8; text-anchor:middle; }
+    .title { font-family:Segoe UI, Helvetica, Arial, sans-serif; font-size:16px; fill:#cbd5e1; text-anchor:middle; }
+    .verdict { font-family:Segoe UI, Helvetica, Arial, sans-serif; font-size:20px; font-weight:800; text-anchor:middle; }
+  </style>
+  <rect width="900" height="300" rx="20" fill="url(#bg)"/>
+  <text x="450" y="38" class="title">What happens when you press Submit</text>
+
+  <path id="track" d="M75 130 L825 130" stroke="#334155" stroke-width="3" stroke-dasharray="6 6" fill="none"/>
+
+  <circle r="9" fill="#22d3ee">
+    <animateMotion dur="6s" repeatCount="indefinite" path="M75 130 L825 130"/>
+  </circle>
+  <circle r="9" fill="#a78bfa" opacity="0.6">
+    <animateMotion dur="6s" begin="2s" repeatCount="indefinite" path="M75 130 L825 130"/>
+  </circle>
+
+  <g>
+    <rect class="box" x="15" y="100" width="120" height="60" rx="12"/>
+    <text class="label" x="75" y="127">Client</text><text class="sub" x="75" y="146">POST /submissions</text>
+    <rect class="box" x="165" y="100" width="120" height="60" rx="12"/>
+    <text class="label" x="225" y="127">API</text><text class="sub" x="225" y="146">saves, replies 202</text>
+    <rect class="box" x="315" y="100" width="120" height="60" rx="12"/>
+    <text class="label" x="375" y="127">Redis queue</text><text class="sub" x="375" y="146">BullMQ tickets</text>
+    <rect class="box" x="465" y="100" width="120" height="60" rx="12"/>
+    <text class="label" x="525" y="127">Worker</text><text class="sub" x="525" y="146">2 at a time</text>
+    <rect class="box" x="615" y="100" width="120" height="60" rx="12" stroke="#22d3ee">
+      <animate attributeName="stroke-width" values="2;5;2" dur="6s" repeatCount="indefinite"/>
+    </rect>
+    <text class="label" x="675" y="127">Docker</text><text class="sub" x="675" y="146">new box per test</text>
+    <rect class="box" x="765" y="100" width="120" height="60" rx="12"/>
+    <text class="label" x="825" y="127">Verdict</text><text class="sub" x="825" y="146">saved in MongoDB</text>
+  </g>
+
+  <text x="450" y="215" class="sub" style="font-size:14px">Sandbox rules: no network, memory limit, CPU limit, process limit, read-only, non-root</text>
+
+  <g transform="translate(450 262)">
+    <text class="verdict" fill="#4ade80" opacity="0">Accepted
+      <animate attributeName="opacity" values="0;1;1;0;0;0;0;0;0" dur="9s" repeatCount="indefinite"/>
+    </text>
+    <text class="verdict" fill="#f87171" opacity="0">Wrong Answer
+      <animate attributeName="opacity" values="0;0;0;0;1;1;0;0;0" dur="9s" repeatCount="indefinite"/>
+    </text>
+    <text class="verdict" fill="#fbbf24" opacity="0">Time Limit Exceeded
+      <animate attributeName="opacity" values="0;0;0;0;0;0;0;1;0" dur="9s" repeatCount="indefinite"/>
+    </text>
+  </g>
+</svg>
