@@ -11,5 +11,19 @@ services:
     ports:
       - "127.0.0.1:6380:6379"
 
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      MONGO_URL: mongodb://mongo:27017/online_judge
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: FP2uJ0AZGT9WV2x31nJvRAD2ftqULpV6riYCSmi7g33
+    depends_on:
+      - mongo
+      - redis
+
 volumes:
   mongo_data:
