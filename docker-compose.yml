@@ -6,5 +6,10 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  redis:
+    image: redis:7
+    ports:
+      - "127.0.0.1:6380:6379"
+
 volumes:
   mongo_data:

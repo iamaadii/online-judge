@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import { Problem } from "../models/Problem.js";
 import { Submission } from "../models/Submission.js";
 import { languages } from "../judge/languages.js";
-import { judgeSubmission } from "../judge/judge.js";
 import { requireLogin } from "../middleware/requireLogin.js";
+import { addJudgeJob } from "../queue/judgeQueue.js";
 
 const router = express.Router();
 const MAX_CODE_LENGTH = 20000;
@@ -48,9 +48,7 @@ router.post("/", requireLogin, async (req, res) => {
       totalTests: problem.testCases.length,
     });
 
-    judgeSubmission(submission._id).catch((err) => {
-      console.log("Judge crashed:", err.message);
-    });
+    await addJudgeJob(submission._id);
 
     return res.status(202).json({ submissionId: submission._id, verdict: "Pending" });
   } catch (err) {
